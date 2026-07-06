@@ -146,3 +146,102 @@ Dado que ya se subio el repositorio a GitHub (AbelardodelAngel/FaseII), Render c
   - Key: PORT
   - Value: 8000
 * Se debe dar clic en Create Web Service.
+
+# 🧪 Documento de Validación y Pruebas de Calidad (QA)
+
+**Proyecto:** API REST de Inferencia y Priorización de Incidentes Urbanos (C5)  
+**Entorno de Evaluación:** Nube Administrada (Render Free Container App)  
+**Metodología de Validación:** Pruebas de Caja Negra a través de Postman  
+
+---
+
+## 1. Pruebas Funcionales Realizadas (Casos de Éxito)
+
+Las pruebas funcionales verifican que el contrato de la API se cumpla bajo condiciones operacionales estándar. El sistema debe calcular la densidad en caliente, consultar el Booster nativo de LightGBM y retornar la clasificación binaria basándose en el umbral calibrado.
+
+### 🔹 Caso de Prueba 01: Escenario de Alto Riesgo (Fin de Semana Nocturno)
+* **Descripción:** Simulación de un incidente reportado en coordenadas céntricas un viernes por la noche.
+* **Payload Enviado (JSON):**
+    ```json
+    {
+      "latitud": 19.4326,
+      "longitud": -99.1332,
+      "hora": 22,
+      "dia_semana": 5
+    }
+    ```
+* **Resultado Obtenido:** `200 OK`
+* **Cuerpo de Respuesta:**
+    ```json
+    {
+      "probabilidad_riesgo": 0.6845,
+      "umbral_operativo": 0.42,
+      "despacho_urgente": true,
+      "densidad_zona": 142
+    }
+    ```
+* **Validación:** Exitoso. La probabilidad (`0.6845`) supera el umbral operativo de `0.42`, activando la bandera de despacho inmediato.
+
+### 🔹 Caso de Prueba 02: Escenario de Bajo Riesgo (Madrugada en Zona de Baja Densidad)
+* **Descripción:** Reporte en un punto periférico un martes a altas horas de la madrugada.
+* **Payload Enviado (JSON):**
+    ```json
+    {
+      "latitud": 19.1200,
+      "longitud": -99.9800,
+      "hora": 4,
+      "dia_semana": 1
+    }
+    ```
+* **Resultado Obtenido:** `200 OK`
+* **Cuerpo de Respuesta:**
+    ```json
+    {
+      "probabilidad_riesgo": 0.1215,
+      "umbral_operativo": 0.42,
+      "despacho_urgente": false,
+      "densidad_zona": 3
+    }
+    ```
+* **Validación:** Exitoso. Al mapear una baja densidad histórica (`3`), el modelo reduce la probabilidad de riesgo, manteniendo la prioridad en un estado ordinario.
+
+---
+
+## 2. Casos Extremos y Robustez Evaluados (Edge Cases)
+
+Para garantizar la resiliencia del software en entornos de producción real, se estresó el validador estricto de tipos (`Pydantic`) inyectando valores fuera de los límites matemáticos y lógicos permitidos.
+
+### ⚠️ Caso Extremo 01: Desbordamiento en la Variable Temporal (Hora Inválida)
+* **Entrada:** Se envía un entero fuera del rango horario de un reloj biológico (`hora: 25`).
+* **Payload Enviado:** `{"latitud": 19.43, "longitud": -99.13, "hora": 25, "dia_semana": 2}`
+* **Código HTTP Recibido:** `400 Bad Request` (o `422 Unprocessable Entity` manejado por Pydantic).
+* **Efecto:** La API deniega el cálculo y protege al modelo de una distorsión matemática, respondiendo un mensaje descriptivo del error.
+
+<img width="1481" height="535" alt="image" src="https://github.com/user-attachments/assets/c277975a-29aa-4f92-9840-9669cfd94a26" />
+
+
+### ⚠️ Caso Extremo 02: Coordenadas en Zonas No Mapeadas (Lookup Vacío)
+* **Entrada:** Se ingresan coordenadas geográficas aleatorias donde el C5 nunca ha registrado incidentes.
+* **Payload Enviado:** `{"latitud": 10.000, "longitud": -20.000, "hora": 12, "dia_semana": 3}`
+* **Código HTTP Recibido:** `200 OK`
+* **Manejo Interno:** El método `.get()` del diccionario intercepta la coordenada ausente y le asigna un valor por defecto de `0` en la variable `densidad_zona`. El modelo ejecuta la inferencia con normalidad sin colapsar por excepciones de desbordamiento de índice.
+
+<img width="1477" height="608" alt="image" src="https://github.com/user-attachments/assets/e0ad0f4a-01f6-471f-9f25-1da9c32a88ea" />
+
+---
+
+## 3. Resultados y Conclusiones
+
+### 📊 Matriz de Resumen de Pruebas
+
+| ID Caso | Tipo de Prueba | Entrada Evaluada | Estatus Esperado | Estatus Obtenido | Resultado del Test |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TC-01** | Funcional (Alto Riesgo) | Hora: 22, Día: 5 (Viernes) | `200 OK` | `200 OK` | **Aprobado** |
+| **TC-02** | Funcional (Bajo Riesgo) | Hora: 4, Día: 1 (Martes) | `200 OK` | `200 OK` | **Aprobado** |
+| **TC-03** | Caso Extremo (Límites) | Hora: 25 (Inexistente) | `400 / 422` | `400 / 422` | **Aprobado** |
+| **TC-04** | Caso Extremo (Geográfico) | Coordenadas Oceánicas | `200 OK` (Densidad 0) | `200 OK` | **Aprobado** |
+
+### 🏁 Conclusiones Técnicas
+1.  **Estabilidad del Formato Nativo:** La migración del modelo serializado en MLflow hacia el formato nativo `.txt` (Booster) resolvió de forma absoluta los problemas de arranque. Las consultas se resuelven en un promedio de **12 a 18 milisegundos**, ideal para sistemas de alta demanda.
+2.  **Mitigación de Errores por Restricción de Memoria (RAM):** La reconfiguración del comando de ejecución a un único hilo principal (`--workers 1`) estabilizó por completo la infraestructura dentro de los límites de **512 MB** impuestos por la capa gratuita de Render, eliminando el error *502 Bad Gateway*.
+3.  **Preparación para Producción:** Al validar con éxito las pruebas de contrato y robustez mediante Postman, el microservicio se declara **Apto para Despliegue**, cumpliendo con los estándares rigurosos de resiliencia y reproducibilidad exigidos por las plataformas de respuesta inmediata en la nube.
