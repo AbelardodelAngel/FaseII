@@ -52,7 +52,6 @@ El ciclo de vida del contenedor se encuentra activo en estado estable (Up). Las 
   ```powershell
    docker run -d -p 8000:8000 --name api-prioridades api-seguridad:tuned-independiente
 ```
----
-
+#
 <img width="1266" height="715" alt="image" src="https://github.com/user-attachments/assets/7d61423d-bea1-43f8-9b98-e00ef05affb8" />
 
