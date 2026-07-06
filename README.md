@@ -29,7 +29,7 @@ workspace/
 ├── modelo_lightgbm_tuned.txt    # Pesos del modelo en formato nativo de LightGBM
 └── frecuencia_zona.pkl          # Diccionario estructurado de densidad urbana (Feature Engineering)
 🛠️ Configuración de los Componentes Core
-
+```
 ---
 
 ## 📑 Evidencia de Despliegue: Contenedorización de la API de Incidentes
@@ -44,3 +44,4 @@ Se ejecutó de manera exitosa el proceso de compilación de la infraestructura c
 * **Comando utilizado para la compilación:**
   ```powershell
   docker build -t api-seguridad:tuned-independiente .
+
