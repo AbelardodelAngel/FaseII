@@ -29,3 +29,16 @@ workspace/
 ├── modelo_lightgbm_tuned.txt    # Pesos del modelo en formato nativo de LightGBM
 └── frecuencia_zona.pkl          # Diccionario estructurado de densidad urbana (Feature Engineering)
 🛠️ Configuración de los Componentes Core
+
+# 📑 Evidencia de Despliegue: Contenedorización de la API de Incidentes
+
+A continuación, se presentan los entregables técnicos que demuestran la correcta construcción, aislamiento y ejecución del microservicio predictivo utilizando Docker.
+
+---
+
+### 1. Imagen Construida Correctamente
+Se ejecutó de manera exitosa el proceso de compilación de la infraestructura como código definida en el `Dockerfile`. La imagen base ligera de Python se configuró instalando las dependencias nativas de C++ (como `libgomp1` para OpenMP) y las librerías del entorno de ejecución de Python.
+
+* **Comando utilizado para la compilación:**
+  ```powershell
+  docker build -t api-seguridad:tuned-independiente .
