@@ -30,7 +30,9 @@ workspace/
 └── frecuencia_zona.pkl          # Diccionario estructurado de densidad urbana (Feature Engineering)
 🛠️ Configuración de los Componentes Core
 
-# 📑 Evidencia de Despliegue: Contenedorización de la API de Incidentes
+---
+
+## 📑 Evidencia de Despliegue: Contenedorización de la API de Incidentes
 
 A continuación, se presentan los entregables técnicos que demuestran la correcta construcción, aislamiento y ejecución del microservicio predictivo utilizando Docker.
 
