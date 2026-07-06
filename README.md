@@ -45,3 +45,5 @@ Se ejecutó de manera exitosa el proceso de compilación de la infraestructura c
   ```powershell
   docker build -t api-seguridad:tuned-independiente .
 
+<img width="1266" height="715" alt="image" src="https://github.com/user-attachments/assets/7d61423d-bea1-43f8-9b98-e00ef05affb8" />
+
