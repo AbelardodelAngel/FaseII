@@ -48,7 +48,8 @@ Se ejecutó de manera exitosa el proceso de compilación de la infraestructura c
 2. Contenedor Docker Funcional
 El ciclo de vida del contenedor se encuentra activo en estado estable (Up). Las variables de entorno de optimización (PYTHONUNBUFFERED=1) permiten que el servidor web asíncrono Uvicorn se mantenga escuchando peticiones concurrentes a través de los 4 hilos (workers) configurados en el puerto 8000.
 
-docker run -d -p 8000:8000 --name api-prioridades api-seguridad:tuned-independiente
+  ```powershell
+    docker run -d -p 8000:8000 --name api-prioridades api-seguridad:tuned-independiente
 
 <img width="1266" height="715" alt="image" src="https://github.com/user-attachments/assets/7d61423d-bea1-43f8-9b98-e00ef05affb8" />
 
