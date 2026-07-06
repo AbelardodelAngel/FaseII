@@ -53,5 +53,9 @@ El ciclo de vida del contenedor se encuentra activo en estado estable (Up). Las 
    docker run -d -p 8000:8000 --name api-prioridades api-seguridad:tuned-independiente
 ```
 #
-<img width="1266" height="715" alt="image" src="https://github.com/user-attachments/assets/7d61423d-bea1-43f8-9b98-e00ef05affb8" />
 
+### 1. Imagen Construida Correctamente
+Se ejecutó de manera exitosa el proceso de compilación de la infraestructura como código definida en el `Dockerfile`. La imagen base ligera de Python se configuró instalando las dependencias nativas de C++ (como `libgomp1` para OpenMP) y las librerías del entorno de ejecución de Python.
+
+
+<img width="1266" height="715" alt="image" src="https://github.com/user-attachments/assets/7d61423d-bea1-43f8-9b98-e00ef05affb8" />
